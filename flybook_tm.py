@@ -15,14 +15,6 @@ client = Actor("Client")
 client.inBoundary = Client_web
 client.protocol = "HTTPS"
 
-'''
-#Trust boundary
-flybook_webapp = Server("Production")
-flybook_webapp.OS = "Unix"
-flybook_webapp.hasAccessControl = True
-flybook_webapp.isHardened = False
-'''
-
 #Datastores
 flybook_dbms = Datastore("MySQL Database (*)")
 flybook_dbms.inBoundary = Web_app
@@ -189,7 +181,6 @@ flightsearch_to_client.data = search_data
 #Service check
 flightsearch_to_servicecheck = Dataflow(process_flight_search, process_check_service, "retrieve webserver status")
 flightsearch_to_servicecheck.protocol = "TCP"
-flightsearch_to_servicecheck.dstPort = 3306
 flightsearch_to_servicecheck.data = status_check
 
 flightbooking_to_servicecheck = Dataflow(process_flight_booking, process_check_service, "retrieve webserver status")
