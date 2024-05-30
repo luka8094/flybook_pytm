@@ -1,0 +1,3169 @@
+<h1 id="pytm-threat-model-over-flybook-with-dataflow-diagram-dfd">PyTM
+threat model over Flybook with Dataflow Diagram (DFD)</h1>
+<hr />
+<h2 id="system-description">System Description</h2>
+<p>Flight booking service</p>
+<h2 id="dataflow-diagram">Dataflow Diagram</h2>
+<figure>
+<img src="flybook.png"
+alt="Context layer (level 0) DFD - Flybook webapp" />
+<figcaption aria-hidden="true">Context layer (level 0) DFD - Flybook
+webapp</figcaption>
+</figure>
+<h2 id="dataflows">Dataflows</h2>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 11%" />
+<col style="width: 14%" />
+<col style="width: 29%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>From</th>
+<th>To</th>
+<th>Data</th>
+<th>Protocol</th>
+<th>Port</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>User credentials</td>
+<td>Client</td>
+<td>Login</td>
+<td>user login credentials (username, password)</td>
+<td>HTTP</td>
+<td>8000</td>
+</tr>
+<tr class="even">
+<td>Auth response</td>
+<td>Login</td>
+<td>Client</td>
+<td>user login credentials (username, password)</td>
+<td>HTTP</td>
+<td>8000</td>
+</tr>
+<tr class="odd">
+<td>user query</td>
+<td>Login</td>
+<td>MySQL Database (*)</td>
+<td>user query (username and password)</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="even">
+<td>query result</td>
+<td>MySQL Database (*)</td>
+<td>Login</td>
+<td>user result (success/failure)</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="odd">
+<td>booking of flight</td>
+<td>Client</td>
+<td>Flight booking</td>
+<td>flight search query</td>
+<td>HTTP</td>
+<td>8000</td>
+</tr>
+<tr class="even">
+<td>booking confirmation</td>
+<td>Flight booking</td>
+<td>Client</td>
+<td>flight search query</td>
+<td>HTTP</td>
+<td>8000</td>
+</tr>
+<tr class="odd">
+<td>flight booking search</td>
+<td>Client</td>
+<td>Flight search</td>
+<td>flight search query</td>
+<td>HTTP</td>
+<td>8000</td>
+</tr>
+<tr class="even">
+<td>flight booking search results</td>
+<td>Client</td>
+<td>Flight booking</td>
+<td>flight search query</td>
+<td>HTTP</td>
+<td>8000</td>
+</tr>
+<tr class="odd">
+<td>retrieve webserver status</td>
+<td>Flight search</td>
+<td>Service check</td>
+<td>Webserver status</td>
+<td>TCP</td>
+<td>3306</td>
+</tr>
+<tr class="even">
+<td>retrieve webserver status</td>
+<td>Flight booking</td>
+<td>Service check</td>
+<td>Webserver status</td>
+<td>TCP</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td>webserver status response</td>
+<td>Service check</td>
+<td>Flight search</td>
+<td>Webserver status</td>
+<td>TCP</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td>webserver status response</td>
+<td>Service check</td>
+<td>Flight booking</td>
+<td>Webserver status</td>
+<td>TCP</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td>flight search database query</td>
+<td>Flight search</td>
+<td>MySQL Database (*)</td>
+<td>SQL query</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="even">
+<td>flight search database result</td>
+<td>MySQL Database (*)</td>
+<td>Flight search</td>
+<td>MySQL query result</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="odd">
+<td>flight booking database query</td>
+<td>Flight booking</td>
+<td>MySQL Database (*)</td>
+<td>SQL query</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="even">
+<td>flight booking database result</td>
+<td>MySQL Database (*)</td>
+<td>Flight booking</td>
+<td>MySQL query result</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+</tbody>
+</table>
+<h2 id="findings">Findings</h2>
+<h3 id="mysql-database">MySQL Database (*)</h3>
+<p><strong>Threat</strong>: 1 - Privilege Abuse</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/122.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 2 - Excessive Allocation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Limit the amount of resources that are
+accessible to unprivileged users. Assume all input is malicious.
+Consider all potentially relevant properties when validating input.
+Consider uniformly throttling all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed. Use resource-limiting settings, if possible.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/130.html,
+http://cwe.mitre.org/data/definitions/770.html,
+http://cwe.mitre.org/data/definitions/404.html</p>
+<p><strong>Threat</strong>: 3 - Encryption Brute Forcing</p>
+<p><strong>Severity</strong>: Low</p>
+<p><strong>Mitigations</strong>: Use commonly accepted algorithms and
+recommended key sizes. The key size used will depend on how important it
+is to keep the data confidential and for how long.In theory a brute
+force attack performing an exhaustive key space search will always
+succeed, so the goal is to have computational security. Moore's law
+needs to be taken into account that suggests that computing resources
+double every eighteen months.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/20.html,
+http://cwe.mitre.org/data/definitions/326.html,
+http://cwe.mitre.org/data/definitions/327.html,
+http://cwe.mitre.org/data/definitions/693.html,
+http://cwe.mitre.org/data/definitions/719.html</p>
+<p><strong>Threat</strong>: 4 - Audit Log Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Use Principle of Least Privilege to
+avoid unauthorized access to log files leading to manipulation/injection
+on those files. Do not allow tainted data to be written in the log file
+without prior input validation. Whitelisting may be used to properly
+validate the data. Use synchronization to control the flow of execution.
+Use static analysis tool to identify log forging vulnerabilities. Avoid
+viewing logs with tools that may interpret control characters in the
+file, such as command-line shells.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/268.html,
+https://capec.mitre.org/data/definitions/93.html</p>
+<h3 id="login">Login</h3>
+<p><strong>Threat</strong>: 5 - Overflow Buffers</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Use a language or compiler that
+performs automatic bounds checking. Use secure functions not vulnerable
+to buffer overflow. If you have to use dangerous functions, make sure
+that you do boundary checking. Compiler-based canary mechanisms such as
+StackGuard, ProPolice and the Microsoft Visual Studio /GS flag. Unless
+this provides automatic bounds checking, it is not a complete solution.
+Use OS-level preventative functionality. Not a complete solution.
+Utilize static source code analysis tools to identify potential buffer
+overflow weaknesses in the software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/100.html,
+http://cwe.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/119.html,
+http://cwe.mitre.org/data/definitions/680.html</p>
+<p><strong>Threat</strong>: 6 - Authentication Abuse/ByPass</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/114.html,
+http://cwe.mitre.org/data/definitions/287.html</p>
+<p><strong>Threat</strong>: 7 - Double Encoding</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Assume all input is malicious. Create a
+white list that defines all valid input to the software system based on
+the requirements specifications. Input that does not match against the
+white list should not be permitted to enter into the system. Test your
+decoding process against malicious input. Be aware of the threat of
+alternative method of data encoding and obfuscation technique such as IP
+address encoding. When client input is required from web-based forms,
+avoid using the GET method to submit data, as the method causes the form
+data to be appended to the URL and is easily manipulated. Instead, use
+the POST method whenever possible. Any security checks should occur
+after the data has been decoded and validated as correct data format. Do
+not repeat decoding process, if bad character are left after decoding
+process, treat the data as suspicious, and fail the validation
+process.Refer to the RFCs to safely decode URL. Regular expression can
+be used to match safe URL patterns. However, that may discard valid URL
+requests if the regular expression is too restrictive. There are tools
+to scan HTTP requests to the server for valid URL such as URLScan from
+Microsoft
+(http://www.microsoft.com/technet/security/tools/urlscan.mspx).</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/173.html,
+http://cwe.mitre.org/data/definitions/177.html</p>
+<p><strong>Threat</strong>: 8 - Privilege Abuse</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/122.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 9 - Buffer Manipulation</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: To help protect an application from
+buffer manipulation attacks, a number of potential mitigations can be
+leveraged. Before starting the development of the application, consider
+using a code language (e.g., Java) or compiler that limits the ability
+of developers to act beyond the bounds of a buffer. If the chosen
+language is susceptible to buffer related issues (e.g., C) then consider
+using secure functions instead of those vulnerable to buffer
+manipulations. If a potentially dangerous function must be used, make
+sure that proper boundary checking is performed. Additionally, there are
+often a number of compiler-based mechanisms (e.g., StackGuard, ProPolice
+and the Microsoft Visual Studio /GS flag) that can help identify and
+protect against potential buffer issues. Finally, there may be operating
+system level preventative functionality that can be applied.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/123.html,
+http://cwe.mitre.org/data/definitions/119.html</p>
+<p><strong>Threat</strong>: 10 - Flooding</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Ensure that protocols have specific
+limits of scale configured. Specify expectations for capabilities and
+dictate which behaviors are acceptable when resource allocation reaches
+limits. Uniformly throttle all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/125.html,
+http://cwe.mitre.org/data/definitions/404.html,
+http://cwe.mitre.org/data/definitions/770.html</p>
+<p><strong>Threat</strong>: 11 - Excessive Allocation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Limit the amount of resources that are
+accessible to unprivileged users. Assume all input is malicious.
+Consider all potentially relevant properties when validating input.
+Consider uniformly throttling all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed. Use resource-limiting settings, if possible.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/130.html,
+http://cwe.mitre.org/data/definitions/770.html,
+http://cwe.mitre.org/data/definitions/404.html</p>
+<p><strong>Threat</strong>: 12 - Format String Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Limit the usage of formatting string
+functions. Strong input validation - All user-controllable input must be
+validated and filtered for illegal formatting characters.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/135.html,
+http://cwe.mitre.org/data/definitions/134.html,
+http://cwe.mitre.org/data/definitions/133.html</p>
+<p><strong>Threat</strong>: 13 - Client-side Injection-induced Buffer
+Overflow</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: The client software should not install
+untrusted code from a non-authenticated server. The client software
+should have the latest patches and should be audited for vulnerabilities
+before being used to communicate with potentially hostile servers.
+Perform input validation for length of buffer inputs. Use a language or
+compiler that performs automatic bounds checking. Use an abstraction
+library to abstract away risky APIs. Not a complete solution.
+Compiler-based canary mechanisms such as StackGuard, ProPolice and the
+Microsoft Visual Studio /GS flag. Unless this provides automatic bounds
+checking, it is not a complete solution. Ensure all buffer uses are
+consistently bounds-checked. Use OS-level preventative functionality.
+Not a complete solution.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/14.html,
+http://cwe.mitre.org/data/definitions/74.html,
+http://cwe.mitre.org/data/definitions/353.html</p>
+<p><strong>Threat</strong>: 14 - Command Delimiters</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Perform whitelist validation
+against a positive specification for command length, type, and
+parameters.Design: Limit program privileges, so if commands circumvent
+program input validation or filter routines then commands do not running
+under a privileged accountImplementation: Perform input validation for
+all remote content.Implementation: Use type conversions such as JDBC
+prepared statements.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/15.html,
+http://cwe.mitre.org/data/definitions/146.html,
+http://cwe.mitre.org/data/definitions/77.html,
+http://cwe.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/154.html</p>
+<p><strong>Threat</strong>: 15 - Input Data Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/153.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 16 - Dictionary-based Password Attack</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Create a strong password policy and
+ensure that your system enforces this policy.Implement an intelligent
+password throttling mechanism. Care must be taken to assure that these
+mechanisms do not excessively enable account lockout attacks such as
+CAPEC-02.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/16.html,
+http://cwe.mitre.org/data/definitions/521.html,
+http://cwe.mitre.org/data/definitions/262.html,
+http://cwe.mitre.org/data/definitions/263.html</p>
+<p><strong>Threat</strong>: 17 - Principal Spoof</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Employ robust authentication processes
+(e.g., multi-factor authentication).</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/195.html</p>
+<p><strong>Threat</strong>: 18 - iFrame Overlay</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Configuration: Disable iFrames in the
+Web browser.Operation: When maintaining an authenticated session with a
+privileged target system, do not use the same browser to navigate to
+unfamiliar sites to perform other activities. Finish working with the
+target system and logout first before proceeding to other
+tasks.Operation: If using the Firefox browser, use the NoScript plug-in
+that will help forbid iFrames.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/222.html,
+http://cwe.mitre.org/data/definitions/1021.html</p>
+<p><strong>Threat</strong>: 19 - File Content Injection</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Design: Enforce principle of least
+privilegeDesign: Validate all input for content including files. Ensure
+that if files and remote content must be accepted that once accepted,
+they are placed in a sandbox type location so that lower assurance
+clients cannot write up to higher assurance processes (like Web server
+processes for example)Design: Execute programs with constrained
+privileges, so parent process does not open up further vulnerabilities.
+Ensure that all directories, temporary directories and files, and memory
+are executing with limited privileges to protect against remote
+execution.Design: Proxy communication to host, so that communications
+are terminated at the proxy, sanitizing the requests before forwarding
+to server host.Implementation: Virus scanning on hostImplementation:
+Host integrity monitoring for critical files, directories, and
+processes. The goal of host integrity monitoring is to be aware when a
+security issue has occurred so that incident response and other forensic
+activities can begin.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/23.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 20 - Privilege Escalation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Very carefully manage the setting,
+management, and handling of privileges. Explicitly manage trust zones in
+the software. Follow the principle of least privilege when assigning
+access rights to entities in a software system. Implement separation of
+privilege - Require multiple conditions to be met before permitting
+access to a system resource.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/233.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 21 - Hijacking a privileged process</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Very carefully manage the setting,
+management, and handling of privileges. Explicitly manage trust zones in
+the software. Follow the principle of least privilege when assigning
+access rights to entities in a software system. Implement separation of
+privilege - Require multiple conditions to be met before permitting
+access to a system resource.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/234.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/648.html</p>
+<p><strong>Threat</strong>: 22 - Catching exception throw/signal from
+privileged block</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Application Architects must be careful
+to design callback, signal, and similar asynchronous constructs such
+that they shed excess privilege prior to handing control to user-written
+(thus untrusted) code.Application Architects must be careful to design
+privileged code blocks such that upon return (successful, failed, or
+unpredicted) that privilege is shed prior to leaving the
+block/scope.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/236.html,
+http://cwe.mitre.org/data/definitions/270.html</p>
+<p><strong>Threat</strong>: 23 - Filter Failure through Buffer
+Overflow</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Make sure that ANY failure occurring in
+the filtering or input validation routine is properly handled and that
+offending input is NOT allowed to go through. Basically make sure that
+the vault is closed when failure occurs.Pre-design: Use a language or
+compiler that performs automatic bounds checking.Pre-design through
+Build: Compiler-based canary mechanisms such as StackGuard, ProPolice
+and the Microsoft Visual Studio /GS flag. Unless this provides automatic
+bounds checking, it is not a complete solution.Operational: Use OS-level
+preventative functionality. Not a complete solution.Design: Use an
+abstraction library to abstract away risky APIs. Not a complete
+solution.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/24.html,
+http://cwe.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/680.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 24 - Resource Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Ensure all input content that is
+delivered to client is sanitized against an acceptable content
+specification.Perform input validation for all content.Enforce regular
+patching of software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/240.html,
+https://capec.mitre.org/data/definitions/240.html</p>
+<p><strong>Threat</strong>: 25 - Code Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Utilize strict type, character, and
+encoding enforcementEnsure all input content that is delivered to client
+is sanitized against an acceptable content specification.Perform input
+validation for all content.Enforce regular patching of software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/242.html,
+http://cwe.mitre.org/data/definitions/94.html</p>
+<p><strong>Threat</strong>: 26 - XSS Targeting HTML Attributes</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+white list all input including that which is not expected to have any
+scripting content.Implementation: The victim should configure the
+browser to minimize active content from untrusted sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/243.html</p>
+<p><strong>Threat</strong>: 27 - XSS Targeting URI Placeholders</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Use browser technologies that
+do not allow client side scripting.Design: Utilize strict type,
+character, and encoding enforcement.Implementation: Ensure all content
+that is delivered to client is sanitized against an acceptable content
+specification.Implementation: Ensure all content coming from the client
+is using the same encoding; if not, the server-side application must
+canonicalize the data before applying any filtering.Implementation:
+Perform input validation for all remote content, including remote and
+user-generated contentImplementation: Perform output validation for all
+remote content.Implementation: Disable scripting languages such as
+JavaScript in browserImplementation: Patching software. There are many
+attack vectors for XSS on the client side and the server side. Many
+vulnerabilities are fixed in service packs for browser, web servers, and
+plug in technologies, staying current on patch release that deal with
+XSS countermeasures mitigates this.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/244.html,
+http://cwe.mitre.org/data/definitions/83.html</p>
+<p><strong>Threat</strong>: 28 - XSS Using Doubled Characters</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+sanitize all user supplied fields.Implementation: The victim should
+configure the browser to minimize active content from untrusted
+sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/245.html</p>
+<p><strong>Threat</strong>: 29 - XSS Using Invalid Characters</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+white list any input that will be included in any subsequent web pages
+or back end operations.Implementation: The victim should configure the
+browser to minimize active content from untrusted sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/247.html,
+https://cwe.mitre.org/data/definitions/86.html</p>
+<p><strong>Threat</strong>: 30 - Command Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All user-controllable input should be
+validated and filtered for potentially unwanted characters. Whitelisting
+input is desired, but if a blacklisting approach is necessary, then
+focusing on command related terms and delimiters is necessary.Input
+should be encoded prior to use in commands to make sure command related
+characters are not treated as part of the command. For example,
+quotation characters may need to be encoded so that the application does
+not treat the quotation as a delimiter.Input should be parameterized, or
+restricted to data sections of a command, thus removing the chance that
+the input will be treated as part of the command itself.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/248.html</p>
+<p><strong>Threat</strong>: 31 - XML Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Strong input validation - All
+user-controllable input must be validated and filtered for illegal
+characters as well as content that can be interpreted in the context of
+an XML data or a query. Use of custom error pages - Attackers can glean
+information about the nature of queries from descriptive error messages.
+Input validation must be coupled with customized error pages that inform
+about an error without disclosing information about the database or
+application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/250.html</p>
+<p><strong>Threat</strong>: 32 - Remote Code Inclusion</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Minimize attacks by input validation
+and sanitization of any user data that will be used by the target
+application to locate a remote file to be included.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/253.html</p>
+<p><strong>Threat</strong>: 33 - Leverage Alternate Encoding</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Assume all input might use an improper
+representation. Use canonicalized data inside the application; all data
+must be converted into the representation used inside the application
+(UTF-8, UTF-16, etc.)Assume all input is malicious. Create a white list
+that defines all valid input to the software system based on the
+requirements specifications. Input that does not match against the white
+list should not be permitted to enter into the system. Test your
+decoding process against malicious input.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/267.html</p>
+<p><strong>Threat</strong>: 34 - Schema Poisoning</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Protect the schema against
+unauthorized modification.Implementation: For applications that use a
+known schema, use a local copy or a known good repository instead of the
+schema reference supplied in the schema document.Implementation: For
+applications that leverage remote schemas, use the HTTPS protocol to
+prevent modification of traffic in transit and to avoid unauthorized
+modification.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/271.html</p>
+<p><strong>Threat</strong>: 35 - Session Hijacking - ClientSide</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Properly encrypt and sign identity
+tokens in transit, and use industry standard session key generation
+mechanisms that utilize high amount of entropy to generate the session
+key. Many standard web and application servers will perform this task on
+your behalf. Utilize a session timeout for all sessions. If the user
+does not explicitly logout, terminate their session after this period of
+inactivity. If the user logs back in then a new session key should be
+generated.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/593.html</p>
+<p><strong>Threat</strong>: 36 - Argument Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Do not program input values
+directly on command shell, instead treat user input as guilty until
+proven innocent. Build a function that takes user input and converts it
+to applications specific types and values, stripping or filtering out
+all unauthorized commands and characters in the process.Design: Limit
+program privileges, so if metacharacters or other methods circumvent
+program input validation routines and shell access is attained then it
+is not running under a privileged account. chroot jails create a sandbox
+for the application to execute in, making it more difficult for an
+attacker to elevate privilege even in the case that a compromise has
+occurred.Implementation: Implement an audit log that is written to a
+separate host, in the event of a compromise the audit log may be able to
+provide evidence and details of the compromise.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/6.html</p>
+<p><strong>Threat</strong>: 37 - Reusing Session IDs (aka Session
+Replay) - ClientSide</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Always invalidate a session ID after
+the user logout.Setup a session time out for the session IDs.Protect the
+communication between the client and server. For instance it is best
+practice to use SSL to mitigate man in the middle attack.Do not code
+send session ID with GET method, otherwise the session ID will be copied
+to the URL. In general avoid writing session IDs in the URLs. URLs can
+get logged in log files, which are vulnerable to an attacker.Encrypt the
+session data associated with the session ID.Use multifactor
+authentication.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/60.html</p>
+<p><strong>Threat</strong>: 38 - Cross Site Request Forgery</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Use cryptographic tokens to associate a
+request with a specific action. The token can be regenerated at every
+request so that if a request with an invalid token is encountered, it
+can be reliably discarded. The token is considered invalid if it arrived
+with a request other than the action it was supposed to be associated
+with.Although less reliable, the use of the optional HTTP Referrer
+header can also be used to determine whether an incoming request was
+actually one that the user is authorized for, in the current
+context.Additionally, the user can also be prompted to confirm an action
+every time an action concerning potentially sensitive data is invoked.
+This way, even if the attacker manages to get the user to click on a
+malicious link and request the desired action, the user has a chance to
+recover by denying confirmation. This solution is also implicitly tied
+to using a second factor of authentication before performing such
+actions.In general, every request must be checked for the appropriate
+authentication token as well as authorization in the current session
+context.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/62.html</p>
+<h3 id="flight-booking">Flight booking</h3>
+<p><strong>Threat</strong>: 39 - Overflow Buffers</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Use a language or compiler that
+performs automatic bounds checking. Use secure functions not vulnerable
+to buffer overflow. If you have to use dangerous functions, make sure
+that you do boundary checking. Compiler-based canary mechanisms such as
+StackGuard, ProPolice and the Microsoft Visual Studio /GS flag. Unless
+this provides automatic bounds checking, it is not a complete solution.
+Use OS-level preventative functionality. Not a complete solution.
+Utilize static source code analysis tools to identify potential buffer
+overflow weaknesses in the software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/100.html,
+http://cwe.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/119.html,
+http://cwe.mitre.org/data/definitions/680.html</p>
+<p><strong>Threat</strong>: 40 - Authentication Abuse/ByPass</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/114.html,
+http://cwe.mitre.org/data/definitions/287.html</p>
+<p><strong>Threat</strong>: 41 - Double Encoding</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Assume all input is malicious. Create a
+white list that defines all valid input to the software system based on
+the requirements specifications. Input that does not match against the
+white list should not be permitted to enter into the system. Test your
+decoding process against malicious input. Be aware of the threat of
+alternative method of data encoding and obfuscation technique such as IP
+address encoding. When client input is required from web-based forms,
+avoid using the GET method to submit data, as the method causes the form
+data to be appended to the URL and is easily manipulated. Instead, use
+the POST method whenever possible. Any security checks should occur
+after the data has been decoded and validated as correct data format. Do
+not repeat decoding process, if bad character are left after decoding
+process, treat the data as suspicious, and fail the validation
+process.Refer to the RFCs to safely decode URL. Regular expression can
+be used to match safe URL patterns. However, that may discard valid URL
+requests if the regular expression is too restrictive. There are tools
+to scan HTTP requests to the server for valid URL such as URLScan from
+Microsoft
+(http://www.microsoft.com/technet/security/tools/urlscan.mspx).</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/173.html,
+http://cwe.mitre.org/data/definitions/177.html</p>
+<p><strong>Threat</strong>: 42 - Privilege Abuse</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/122.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 43 - Buffer Manipulation</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: To help protect an application from
+buffer manipulation attacks, a number of potential mitigations can be
+leveraged. Before starting the development of the application, consider
+using a code language (e.g., Java) or compiler that limits the ability
+of developers to act beyond the bounds of a buffer. If the chosen
+language is susceptible to buffer related issues (e.g., C) then consider
+using secure functions instead of those vulnerable to buffer
+manipulations. If a potentially dangerous function must be used, make
+sure that proper boundary checking is performed. Additionally, there are
+often a number of compiler-based mechanisms (e.g., StackGuard, ProPolice
+and the Microsoft Visual Studio /GS flag) that can help identify and
+protect against potential buffer issues. Finally, there may be operating
+system level preventative functionality that can be applied.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/123.html,
+http://cwe.mitre.org/data/definitions/119.html</p>
+<p><strong>Threat</strong>: 44 - Flooding</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Ensure that protocols have specific
+limits of scale configured. Specify expectations for capabilities and
+dictate which behaviors are acceptable when resource allocation reaches
+limits. Uniformly throttle all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/125.html,
+http://cwe.mitre.org/data/definitions/404.html,
+http://cwe.mitre.org/data/definitions/770.html</p>
+<p><strong>Threat</strong>: 45 - Excessive Allocation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Limit the amount of resources that are
+accessible to unprivileged users. Assume all input is malicious.
+Consider all potentially relevant properties when validating input.
+Consider uniformly throttling all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed. Use resource-limiting settings, if possible.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/130.html,
+http://cwe.mitre.org/data/definitions/770.html,
+http://cwe.mitre.org/data/definitions/404.html</p>
+<p><strong>Threat</strong>: 46 - Format String Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Limit the usage of formatting string
+functions. Strong input validation - All user-controllable input must be
+validated and filtered for illegal formatting characters.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/135.html,
+http://cwe.mitre.org/data/definitions/134.html,
+http://cwe.mitre.org/data/definitions/133.html</p>
+<p><strong>Threat</strong>: 47 - Client-side Injection-induced Buffer
+Overflow</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: The client software should not install
+untrusted code from a non-authenticated server. The client software
+should have the latest patches and should be audited for vulnerabilities
+before being used to communicate with potentially hostile servers.
+Perform input validation for length of buffer inputs. Use a language or
+compiler that performs automatic bounds checking. Use an abstraction
+library to abstract away risky APIs. Not a complete solution.
+Compiler-based canary mechanisms such as StackGuard, ProPolice and the
+Microsoft Visual Studio /GS flag. Unless this provides automatic bounds
+checking, it is not a complete solution. Ensure all buffer uses are
+consistently bounds-checked. Use OS-level preventative functionality.
+Not a complete solution.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/14.html,
+http://cwe.mitre.org/data/definitions/74.html,
+http://cwe.mitre.org/data/definitions/353.html</p>
+<p><strong>Threat</strong>: 48 - Command Delimiters</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Perform whitelist validation
+against a positive specification for command length, type, and
+parameters.Design: Limit program privileges, so if commands circumvent
+program input validation or filter routines then commands do not running
+under a privileged accountImplementation: Perform input validation for
+all remote content.Implementation: Use type conversions such as JDBC
+prepared statements.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/15.html,
+http://cwe.mitre.org/data/definitions/146.html,
+http://cwe.mitre.org/data/definitions/77.html,
+http://cwe.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/154.html</p>
+<p><strong>Threat</strong>: 49 - Input Data Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/153.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 50 - Dictionary-based Password Attack</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Create a strong password policy and
+ensure that your system enforces this policy.Implement an intelligent
+password throttling mechanism. Care must be taken to assure that these
+mechanisms do not excessively enable account lockout attacks such as
+CAPEC-02.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/16.html,
+http://cwe.mitre.org/data/definitions/521.html,
+http://cwe.mitre.org/data/definitions/262.html,
+http://cwe.mitre.org/data/definitions/263.html</p>
+<p><strong>Threat</strong>: 51 - Principal Spoof</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Employ robust authentication processes
+(e.g., multi-factor authentication).</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/195.html</p>
+<p><strong>Threat</strong>: 52 - iFrame Overlay</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Configuration: Disable iFrames in the
+Web browser.Operation: When maintaining an authenticated session with a
+privileged target system, do not use the same browser to navigate to
+unfamiliar sites to perform other activities. Finish working with the
+target system and logout first before proceeding to other
+tasks.Operation: If using the Firefox browser, use the NoScript plug-in
+that will help forbid iFrames.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/222.html,
+http://cwe.mitre.org/data/definitions/1021.html</p>
+<p><strong>Threat</strong>: 53 - File Content Injection</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Design: Enforce principle of least
+privilegeDesign: Validate all input for content including files. Ensure
+that if files and remote content must be accepted that once accepted,
+they are placed in a sandbox type location so that lower assurance
+clients cannot write up to higher assurance processes (like Web server
+processes for example)Design: Execute programs with constrained
+privileges, so parent process does not open up further vulnerabilities.
+Ensure that all directories, temporary directories and files, and memory
+are executing with limited privileges to protect against remote
+execution.Design: Proxy communication to host, so that communications
+are terminated at the proxy, sanitizing the requests before forwarding
+to server host.Implementation: Virus scanning on hostImplementation:
+Host integrity monitoring for critical files, directories, and
+processes. The goal of host integrity monitoring is to be aware when a
+security issue has occurred so that incident response and other forensic
+activities can begin.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/23.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 54 - Privilege Escalation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Very carefully manage the setting,
+management, and handling of privileges. Explicitly manage trust zones in
+the software. Follow the principle of least privilege when assigning
+access rights to entities in a software system. Implement separation of
+privilege - Require multiple conditions to be met before permitting
+access to a system resource.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/233.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 55 - Hijacking a privileged process</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Very carefully manage the setting,
+management, and handling of privileges. Explicitly manage trust zones in
+the software. Follow the principle of least privilege when assigning
+access rights to entities in a software system. Implement separation of
+privilege - Require multiple conditions to be met before permitting
+access to a system resource.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/234.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/648.html</p>
+<p><strong>Threat</strong>: 56 - Catching exception throw/signal from
+privileged block</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Application Architects must be careful
+to design callback, signal, and similar asynchronous constructs such
+that they shed excess privilege prior to handing control to user-written
+(thus untrusted) code.Application Architects must be careful to design
+privileged code blocks such that upon return (successful, failed, or
+unpredicted) that privilege is shed prior to leaving the
+block/scope.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/236.html,
+http://cwe.mitre.org/data/definitions/270.html</p>
+<p><strong>Threat</strong>: 57 - Filter Failure through Buffer
+Overflow</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Make sure that ANY failure occurring in
+the filtering or input validation routine is properly handled and that
+offending input is NOT allowed to go through. Basically make sure that
+the vault is closed when failure occurs.Pre-design: Use a language or
+compiler that performs automatic bounds checking.Pre-design through
+Build: Compiler-based canary mechanisms such as StackGuard, ProPolice
+and the Microsoft Visual Studio /GS flag. Unless this provides automatic
+bounds checking, it is not a complete solution.Operational: Use OS-level
+preventative functionality. Not a complete solution.Design: Use an
+abstraction library to abstract away risky APIs. Not a complete
+solution.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/24.html,
+http://cwe.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/680.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 58 - Resource Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Ensure all input content that is
+delivered to client is sanitized against an acceptable content
+specification.Perform input validation for all content.Enforce regular
+patching of software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/240.html,
+https://capec.mitre.org/data/definitions/240.html</p>
+<p><strong>Threat</strong>: 59 - Code Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Utilize strict type, character, and
+encoding enforcementEnsure all input content that is delivered to client
+is sanitized against an acceptable content specification.Perform input
+validation for all content.Enforce regular patching of software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/242.html,
+http://cwe.mitre.org/data/definitions/94.html</p>
+<p><strong>Threat</strong>: 60 - XSS Targeting HTML Attributes</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+white list all input including that which is not expected to have any
+scripting content.Implementation: The victim should configure the
+browser to minimize active content from untrusted sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/243.html</p>
+<p><strong>Threat</strong>: 61 - XSS Targeting URI Placeholders</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Use browser technologies that
+do not allow client side scripting.Design: Utilize strict type,
+character, and encoding enforcement.Implementation: Ensure all content
+that is delivered to client is sanitized against an acceptable content
+specification.Implementation: Ensure all content coming from the client
+is using the same encoding; if not, the server-side application must
+canonicalize the data before applying any filtering.Implementation:
+Perform input validation for all remote content, including remote and
+user-generated contentImplementation: Perform output validation for all
+remote content.Implementation: Disable scripting languages such as
+JavaScript in browserImplementation: Patching software. There are many
+attack vectors for XSS on the client side and the server side. Many
+vulnerabilities are fixed in service packs for browser, web servers, and
+plug in technologies, staying current on patch release that deal with
+XSS countermeasures mitigates this.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/244.html,
+http://cwe.mitre.org/data/definitions/83.html</p>
+<p><strong>Threat</strong>: 62 - XSS Using Doubled Characters</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+sanitize all user supplied fields.Implementation: The victim should
+configure the browser to minimize active content from untrusted
+sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/245.html</p>
+<p><strong>Threat</strong>: 63 - XSS Using Invalid Characters</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+white list any input that will be included in any subsequent web pages
+or back end operations.Implementation: The victim should configure the
+browser to minimize active content from untrusted sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/247.html,
+https://cwe.mitre.org/data/definitions/86.html</p>
+<p><strong>Threat</strong>: 64 - Command Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All user-controllable input should be
+validated and filtered for potentially unwanted characters. Whitelisting
+input is desired, but if a blacklisting approach is necessary, then
+focusing on command related terms and delimiters is necessary.Input
+should be encoded prior to use in commands to make sure command related
+characters are not treated as part of the command. For example,
+quotation characters may need to be encoded so that the application does
+not treat the quotation as a delimiter.Input should be parameterized, or
+restricted to data sections of a command, thus removing the chance that
+the input will be treated as part of the command itself.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/248.html</p>
+<p><strong>Threat</strong>: 65 - XML Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Strong input validation - All
+user-controllable input must be validated and filtered for illegal
+characters as well as content that can be interpreted in the context of
+an XML data or a query. Use of custom error pages - Attackers can glean
+information about the nature of queries from descriptive error messages.
+Input validation must be coupled with customized error pages that inform
+about an error without disclosing information about the database or
+application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/250.html</p>
+<p><strong>Threat</strong>: 66 - Remote Code Inclusion</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Minimize attacks by input validation
+and sanitization of any user data that will be used by the target
+application to locate a remote file to be included.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/253.html</p>
+<p><strong>Threat</strong>: 67 - Leverage Alternate Encoding</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Assume all input might use an improper
+representation. Use canonicalized data inside the application; all data
+must be converted into the representation used inside the application
+(UTF-8, UTF-16, etc.)Assume all input is malicious. Create a white list
+that defines all valid input to the software system based on the
+requirements specifications. Input that does not match against the white
+list should not be permitted to enter into the system. Test your
+decoding process against malicious input.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/267.html</p>
+<p><strong>Threat</strong>: 68 - Schema Poisoning</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Protect the schema against
+unauthorized modification.Implementation: For applications that use a
+known schema, use a local copy or a known good repository instead of the
+schema reference supplied in the schema document.Implementation: For
+applications that leverage remote schemas, use the HTTPS protocol to
+prevent modification of traffic in transit and to avoid unauthorized
+modification.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/271.html</p>
+<p><strong>Threat</strong>: 69 - Session Hijacking - ClientSide</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Properly encrypt and sign identity
+tokens in transit, and use industry standard session key generation
+mechanisms that utilize high amount of entropy to generate the session
+key. Many standard web and application servers will perform this task on
+your behalf. Utilize a session timeout for all sessions. If the user
+does not explicitly logout, terminate their session after this period of
+inactivity. If the user logs back in then a new session key should be
+generated.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/593.html</p>
+<p><strong>Threat</strong>: 70 - Argument Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Do not program input values
+directly on command shell, instead treat user input as guilty until
+proven innocent. Build a function that takes user input and converts it
+to applications specific types and values, stripping or filtering out
+all unauthorized commands and characters in the process.Design: Limit
+program privileges, so if metacharacters or other methods circumvent
+program input validation routines and shell access is attained then it
+is not running under a privileged account. chroot jails create a sandbox
+for the application to execute in, making it more difficult for an
+attacker to elevate privilege even in the case that a compromise has
+occurred.Implementation: Implement an audit log that is written to a
+separate host, in the event of a compromise the audit log may be able to
+provide evidence and details of the compromise.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/6.html</p>
+<p><strong>Threat</strong>: 71 - Reusing Session IDs (aka Session
+Replay) - ClientSide</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Always invalidate a session ID after
+the user logout.Setup a session time out for the session IDs.Protect the
+communication between the client and server. For instance it is best
+practice to use SSL to mitigate man in the middle attack.Do not code
+send session ID with GET method, otherwise the session ID will be copied
+to the URL. In general avoid writing session IDs in the URLs. URLs can
+get logged in log files, which are vulnerable to an attacker.Encrypt the
+session data associated with the session ID.Use multifactor
+authentication.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/60.html</p>
+<p><strong>Threat</strong>: 72 - Cross Site Request Forgery</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Use cryptographic tokens to associate a
+request with a specific action. The token can be regenerated at every
+request so that if a request with an invalid token is encountered, it
+can be reliably discarded. The token is considered invalid if it arrived
+with a request other than the action it was supposed to be associated
+with.Although less reliable, the use of the optional HTTP Referrer
+header can also be used to determine whether an incoming request was
+actually one that the user is authorized for, in the current
+context.Additionally, the user can also be prompted to confirm an action
+every time an action concerning potentially sensitive data is invoked.
+This way, even if the attacker manages to get the user to click on a
+malicious link and request the desired action, the user has a chance to
+recover by denying confirmation. This solution is also implicitly tied
+to using a second factor of authentication before performing such
+actions.In general, every request must be checked for the appropriate
+authentication token as well as authorization in the current session
+context.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/62.html</p>
+<h3 id="service-check">Service check</h3>
+<p><strong>Threat</strong>: 73 - Overflow Buffers</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Use a language or compiler that
+performs automatic bounds checking. Use secure functions not vulnerable
+to buffer overflow. If you have to use dangerous functions, make sure
+that you do boundary checking. Compiler-based canary mechanisms such as
+StackGuard, ProPolice and the Microsoft Visual Studio /GS flag. Unless
+this provides automatic bounds checking, it is not a complete solution.
+Use OS-level preventative functionality. Not a complete solution.
+Utilize static source code analysis tools to identify potential buffer
+overflow weaknesses in the software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/100.html,
+http://cwe.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/119.html,
+http://cwe.mitre.org/data/definitions/680.html</p>
+<p><strong>Threat</strong>: 74 - Authentication Abuse/ByPass</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/114.html,
+http://cwe.mitre.org/data/definitions/287.html</p>
+<p><strong>Threat</strong>: 75 - Double Encoding</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Assume all input is malicious. Create a
+white list that defines all valid input to the software system based on
+the requirements specifications. Input that does not match against the
+white list should not be permitted to enter into the system. Test your
+decoding process against malicious input. Be aware of the threat of
+alternative method of data encoding and obfuscation technique such as IP
+address encoding. When client input is required from web-based forms,
+avoid using the GET method to submit data, as the method causes the form
+data to be appended to the URL and is easily manipulated. Instead, use
+the POST method whenever possible. Any security checks should occur
+after the data has been decoded and validated as correct data format. Do
+not repeat decoding process, if bad character are left after decoding
+process, treat the data as suspicious, and fail the validation
+process.Refer to the RFCs to safely decode URL. Regular expression can
+be used to match safe URL patterns. However, that may discard valid URL
+requests if the regular expression is too restrictive. There are tools
+to scan HTTP requests to the server for valid URL such as URLScan from
+Microsoft
+(http://www.microsoft.com/technet/security/tools/urlscan.mspx).</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/173.html,
+http://cwe.mitre.org/data/definitions/177.html</p>
+<p><strong>Threat</strong>: 76 - Privilege Abuse</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/122.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 77 - Buffer Manipulation</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: To help protect an application from
+buffer manipulation attacks, a number of potential mitigations can be
+leveraged. Before starting the development of the application, consider
+using a code language (e.g., Java) or compiler that limits the ability
+of developers to act beyond the bounds of a buffer. If the chosen
+language is susceptible to buffer related issues (e.g., C) then consider
+using secure functions instead of those vulnerable to buffer
+manipulations. If a potentially dangerous function must be used, make
+sure that proper boundary checking is performed. Additionally, there are
+often a number of compiler-based mechanisms (e.g., StackGuard, ProPolice
+and the Microsoft Visual Studio /GS flag) that can help identify and
+protect against potential buffer issues. Finally, there may be operating
+system level preventative functionality that can be applied.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/123.html,
+http://cwe.mitre.org/data/definitions/119.html</p>
+<p><strong>Threat</strong>: 78 - Flooding</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Ensure that protocols have specific
+limits of scale configured. Specify expectations for capabilities and
+dictate which behaviors are acceptable when resource allocation reaches
+limits. Uniformly throttle all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/125.html,
+http://cwe.mitre.org/data/definitions/404.html,
+http://cwe.mitre.org/data/definitions/770.html</p>
+<p><strong>Threat</strong>: 79 - Excessive Allocation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Limit the amount of resources that are
+accessible to unprivileged users. Assume all input is malicious.
+Consider all potentially relevant properties when validating input.
+Consider uniformly throttling all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed. Use resource-limiting settings, if possible.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/130.html,
+http://cwe.mitre.org/data/definitions/770.html,
+http://cwe.mitre.org/data/definitions/404.html</p>
+<p><strong>Threat</strong>: 80 - Format String Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Limit the usage of formatting string
+functions. Strong input validation - All user-controllable input must be
+validated and filtered for illegal formatting characters.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/135.html,
+http://cwe.mitre.org/data/definitions/134.html,
+http://cwe.mitre.org/data/definitions/133.html</p>
+<p><strong>Threat</strong>: 81 - Client-side Injection-induced Buffer
+Overflow</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: The client software should not install
+untrusted code from a non-authenticated server. The client software
+should have the latest patches and should be audited for vulnerabilities
+before being used to communicate with potentially hostile servers.
+Perform input validation for length of buffer inputs. Use a language or
+compiler that performs automatic bounds checking. Use an abstraction
+library to abstract away risky APIs. Not a complete solution.
+Compiler-based canary mechanisms such as StackGuard, ProPolice and the
+Microsoft Visual Studio /GS flag. Unless this provides automatic bounds
+checking, it is not a complete solution. Ensure all buffer uses are
+consistently bounds-checked. Use OS-level preventative functionality.
+Not a complete solution.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/14.html,
+http://cwe.mitre.org/data/definitions/74.html,
+http://cwe.mitre.org/data/definitions/353.html</p>
+<p><strong>Threat</strong>: 82 - Command Delimiters</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Perform whitelist validation
+against a positive specification for command length, type, and
+parameters.Design: Limit program privileges, so if commands circumvent
+program input validation or filter routines then commands do not running
+under a privileged accountImplementation: Perform input validation for
+all remote content.Implementation: Use type conversions such as JDBC
+prepared statements.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/15.html,
+http://cwe.mitre.org/data/definitions/146.html,
+http://cwe.mitre.org/data/definitions/77.html,
+http://cwe.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/154.html</p>
+<p><strong>Threat</strong>: 83 - Input Data Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/153.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 84 - Dictionary-based Password Attack</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Create a strong password policy and
+ensure that your system enforces this policy.Implement an intelligent
+password throttling mechanism. Care must be taken to assure that these
+mechanisms do not excessively enable account lockout attacks such as
+CAPEC-02.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/16.html,
+http://cwe.mitre.org/data/definitions/521.html,
+http://cwe.mitre.org/data/definitions/262.html,
+http://cwe.mitre.org/data/definitions/263.html</p>
+<p><strong>Threat</strong>: 85 - Principal Spoof</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Employ robust authentication processes
+(e.g., multi-factor authentication).</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/195.html</p>
+<p><strong>Threat</strong>: 86 - iFrame Overlay</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Configuration: Disable iFrames in the
+Web browser.Operation: When maintaining an authenticated session with a
+privileged target system, do not use the same browser to navigate to
+unfamiliar sites to perform other activities. Finish working with the
+target system and logout first before proceeding to other
+tasks.Operation: If using the Firefox browser, use the NoScript plug-in
+that will help forbid iFrames.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/222.html,
+http://cwe.mitre.org/data/definitions/1021.html</p>
+<p><strong>Threat</strong>: 87 - File Content Injection</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Design: Enforce principle of least
+privilegeDesign: Validate all input for content including files. Ensure
+that if files and remote content must be accepted that once accepted,
+they are placed in a sandbox type location so that lower assurance
+clients cannot write up to higher assurance processes (like Web server
+processes for example)Design: Execute programs with constrained
+privileges, so parent process does not open up further vulnerabilities.
+Ensure that all directories, temporary directories and files, and memory
+are executing with limited privileges to protect against remote
+execution.Design: Proxy communication to host, so that communications
+are terminated at the proxy, sanitizing the requests before forwarding
+to server host.Implementation: Virus scanning on hostImplementation:
+Host integrity monitoring for critical files, directories, and
+processes. The goal of host integrity monitoring is to be aware when a
+security issue has occurred so that incident response and other forensic
+activities can begin.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/23.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 88 - Privilege Escalation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Very carefully manage the setting,
+management, and handling of privileges. Explicitly manage trust zones in
+the software. Follow the principle of least privilege when assigning
+access rights to entities in a software system. Implement separation of
+privilege - Require multiple conditions to be met before permitting
+access to a system resource.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/233.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 89 - Hijacking a privileged process</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Very carefully manage the setting,
+management, and handling of privileges. Explicitly manage trust zones in
+the software. Follow the principle of least privilege when assigning
+access rights to entities in a software system. Implement separation of
+privilege - Require multiple conditions to be met before permitting
+access to a system resource.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/234.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/648.html</p>
+<p><strong>Threat</strong>: 90 - Catching exception throw/signal from
+privileged block</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Application Architects must be careful
+to design callback, signal, and similar asynchronous constructs such
+that they shed excess privilege prior to handing control to user-written
+(thus untrusted) code.Application Architects must be careful to design
+privileged code blocks such that upon return (successful, failed, or
+unpredicted) that privilege is shed prior to leaving the
+block/scope.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/236.html,
+http://cwe.mitre.org/data/definitions/270.html</p>
+<p><strong>Threat</strong>: 91 - Filter Failure through Buffer
+Overflow</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Make sure that ANY failure occurring in
+the filtering or input validation routine is properly handled and that
+offending input is NOT allowed to go through. Basically make sure that
+the vault is closed when failure occurs.Pre-design: Use a language or
+compiler that performs automatic bounds checking.Pre-design through
+Build: Compiler-based canary mechanisms such as StackGuard, ProPolice
+and the Microsoft Visual Studio /GS flag. Unless this provides automatic
+bounds checking, it is not a complete solution.Operational: Use OS-level
+preventative functionality. Not a complete solution.Design: Use an
+abstraction library to abstract away risky APIs. Not a complete
+solution.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/24.html,
+http://cwe.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/680.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 92 - Resource Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Ensure all input content that is
+delivered to client is sanitized against an acceptable content
+specification.Perform input validation for all content.Enforce regular
+patching of software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/240.html,
+https://capec.mitre.org/data/definitions/240.html</p>
+<p><strong>Threat</strong>: 93 - Code Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Utilize strict type, character, and
+encoding enforcementEnsure all input content that is delivered to client
+is sanitized against an acceptable content specification.Perform input
+validation for all content.Enforce regular patching of software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/242.html,
+http://cwe.mitre.org/data/definitions/94.html</p>
+<p><strong>Threat</strong>: 94 - XSS Targeting HTML Attributes</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+white list all input including that which is not expected to have any
+scripting content.Implementation: The victim should configure the
+browser to minimize active content from untrusted sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/243.html</p>
+<p><strong>Threat</strong>: 95 - XSS Targeting URI Placeholders</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Use browser technologies that
+do not allow client side scripting.Design: Utilize strict type,
+character, and encoding enforcement.Implementation: Ensure all content
+that is delivered to client is sanitized against an acceptable content
+specification.Implementation: Ensure all content coming from the client
+is using the same encoding; if not, the server-side application must
+canonicalize the data before applying any filtering.Implementation:
+Perform input validation for all remote content, including remote and
+user-generated contentImplementation: Perform output validation for all
+remote content.Implementation: Disable scripting languages such as
+JavaScript in browserImplementation: Patching software. There are many
+attack vectors for XSS on the client side and the server side. Many
+vulnerabilities are fixed in service packs for browser, web servers, and
+plug in technologies, staying current on patch release that deal with
+XSS countermeasures mitigates this.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/244.html,
+http://cwe.mitre.org/data/definitions/83.html</p>
+<p><strong>Threat</strong>: 96 - XSS Using Doubled Characters</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+sanitize all user supplied fields.Implementation: The victim should
+configure the browser to minimize active content from untrusted
+sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/245.html</p>
+<p><strong>Threat</strong>: 97 - XSS Using Invalid Characters</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+white list any input that will be included in any subsequent web pages
+or back end operations.Implementation: The victim should configure the
+browser to minimize active content from untrusted sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/247.html,
+https://cwe.mitre.org/data/definitions/86.html</p>
+<p><strong>Threat</strong>: 98 - Command Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All user-controllable input should be
+validated and filtered for potentially unwanted characters. Whitelisting
+input is desired, but if a blacklisting approach is necessary, then
+focusing on command related terms and delimiters is necessary.Input
+should be encoded prior to use in commands to make sure command related
+characters are not treated as part of the command. For example,
+quotation characters may need to be encoded so that the application does
+not treat the quotation as a delimiter.Input should be parameterized, or
+restricted to data sections of a command, thus removing the chance that
+the input will be treated as part of the command itself.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/248.html</p>
+<p><strong>Threat</strong>: 99 - XML Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Strong input validation - All
+user-controllable input must be validated and filtered for illegal
+characters as well as content that can be interpreted in the context of
+an XML data or a query. Use of custom error pages - Attackers can glean
+information about the nature of queries from descriptive error messages.
+Input validation must be coupled with customized error pages that inform
+about an error without disclosing information about the database or
+application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/250.html</p>
+<p><strong>Threat</strong>: 100 - Remote Code Inclusion</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Minimize attacks by input validation
+and sanitization of any user data that will be used by the target
+application to locate a remote file to be included.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/253.html</p>
+<p><strong>Threat</strong>: 101 - Leverage Alternate Encoding</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Assume all input might use an improper
+representation. Use canonicalized data inside the application; all data
+must be converted into the representation used inside the application
+(UTF-8, UTF-16, etc.)Assume all input is malicious. Create a white list
+that defines all valid input to the software system based on the
+requirements specifications. Input that does not match against the white
+list should not be permitted to enter into the system. Test your
+decoding process against malicious input.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/267.html</p>
+<p><strong>Threat</strong>: 102 - Schema Poisoning</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Protect the schema against
+unauthorized modification.Implementation: For applications that use a
+known schema, use a local copy or a known good repository instead of the
+schema reference supplied in the schema document.Implementation: For
+applications that leverage remote schemas, use the HTTPS protocol to
+prevent modification of traffic in transit and to avoid unauthorized
+modification.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/271.html</p>
+<p><strong>Threat</strong>: 103 - Session Hijacking - ClientSide</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Properly encrypt and sign identity
+tokens in transit, and use industry standard session key generation
+mechanisms that utilize high amount of entropy to generate the session
+key. Many standard web and application servers will perform this task on
+your behalf. Utilize a session timeout for all sessions. If the user
+does not explicitly logout, terminate their session after this period of
+inactivity. If the user logs back in then a new session key should be
+generated.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/593.html</p>
+<p><strong>Threat</strong>: 104 - Argument Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Do not program input values
+directly on command shell, instead treat user input as guilty until
+proven innocent. Build a function that takes user input and converts it
+to applications specific types and values, stripping or filtering out
+all unauthorized commands and characters in the process.Design: Limit
+program privileges, so if metacharacters or other methods circumvent
+program input validation routines and shell access is attained then it
+is not running under a privileged account. chroot jails create a sandbox
+for the application to execute in, making it more difficult for an
+attacker to elevate privilege even in the case that a compromise has
+occurred.Implementation: Implement an audit log that is written to a
+separate host, in the event of a compromise the audit log may be able to
+provide evidence and details of the compromise.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/6.html</p>
+<p><strong>Threat</strong>: 105 - Reusing Session IDs (aka Session
+Replay) - ClientSide</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Always invalidate a session ID after
+the user logout.Setup a session time out for the session IDs.Protect the
+communication between the client and server. For instance it is best
+practice to use SSL to mitigate man in the middle attack.Do not code
+send session ID with GET method, otherwise the session ID will be copied
+to the URL. In general avoid writing session IDs in the URLs. URLs can
+get logged in log files, which are vulnerable to an attacker.Encrypt the
+session data associated with the session ID.Use multifactor
+authentication.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/60.html</p>
+<p><strong>Threat</strong>: 106 - Cross Site Request Forgery</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Use cryptographic tokens to associate a
+request with a specific action. The token can be regenerated at every
+request so that if a request with an invalid token is encountered, it
+can be reliably discarded. The token is considered invalid if it arrived
+with a request other than the action it was supposed to be associated
+with.Although less reliable, the use of the optional HTTP Referrer
+header can also be used to determine whether an incoming request was
+actually one that the user is authorized for, in the current
+context.Additionally, the user can also be prompted to confirm an action
+every time an action concerning potentially sensitive data is invoked.
+This way, even if the attacker manages to get the user to click on a
+malicious link and request the desired action, the user has a chance to
+recover by denying confirmation. This solution is also implicitly tied
+to using a second factor of authentication before performing such
+actions.In general, every request must be checked for the appropriate
+authentication token as well as authorization in the current session
+context.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/62.html</p>
+<h3 id="flight-search">Flight search</h3>
+<p><strong>Threat</strong>: 107 - Overflow Buffers</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Use a language or compiler that
+performs automatic bounds checking. Use secure functions not vulnerable
+to buffer overflow. If you have to use dangerous functions, make sure
+that you do boundary checking. Compiler-based canary mechanisms such as
+StackGuard, ProPolice and the Microsoft Visual Studio /GS flag. Unless
+this provides automatic bounds checking, it is not a complete solution.
+Use OS-level preventative functionality. Not a complete solution.
+Utilize static source code analysis tools to identify potential buffer
+overflow weaknesses in the software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/100.html,
+http://cwe.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/119.html,
+http://cwe.mitre.org/data/definitions/680.html</p>
+<p><strong>Threat</strong>: 108 - Authentication Abuse/ByPass</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/114.html,
+http://cwe.mitre.org/data/definitions/287.html</p>
+<p><strong>Threat</strong>: 109 - Double Encoding</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Assume all input is malicious. Create a
+white list that defines all valid input to the software system based on
+the requirements specifications. Input that does not match against the
+white list should not be permitted to enter into the system. Test your
+decoding process against malicious input. Be aware of the threat of
+alternative method of data encoding and obfuscation technique such as IP
+address encoding. When client input is required from web-based forms,
+avoid using the GET method to submit data, as the method causes the form
+data to be appended to the URL and is easily manipulated. Instead, use
+the POST method whenever possible. Any security checks should occur
+after the data has been decoded and validated as correct data format. Do
+not repeat decoding process, if bad character are left after decoding
+process, treat the data as suspicious, and fail the validation
+process.Refer to the RFCs to safely decode URL. Regular expression can
+be used to match safe URL patterns. However, that may discard valid URL
+requests if the regular expression is too restrictive. There are tools
+to scan HTTP requests to the server for valid URL such as URLScan from
+Microsoft
+(http://www.microsoft.com/technet/security/tools/urlscan.mspx).</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/173.html,
+http://cwe.mitre.org/data/definitions/177.html</p>
+<p><strong>Threat</strong>: 110 - Privilege Abuse</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication and
+authorization mechanisms. A proven protocol is OAuth 2.0, which enables
+a third-party application to obtain limited access to an API.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/122.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 111 - Buffer Manipulation</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: To help protect an application from
+buffer manipulation attacks, a number of potential mitigations can be
+leveraged. Before starting the development of the application, consider
+using a code language (e.g., Java) or compiler that limits the ability
+of developers to act beyond the bounds of a buffer. If the chosen
+language is susceptible to buffer related issues (e.g., C) then consider
+using secure functions instead of those vulnerable to buffer
+manipulations. If a potentially dangerous function must be used, make
+sure that proper boundary checking is performed. Additionally, there are
+often a number of compiler-based mechanisms (e.g., StackGuard, ProPolice
+and the Microsoft Visual Studio /GS flag) that can help identify and
+protect against potential buffer issues. Finally, there may be operating
+system level preventative functionality that can be applied.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/123.html,
+http://cwe.mitre.org/data/definitions/119.html</p>
+<p><strong>Threat</strong>: 112 - Flooding</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Ensure that protocols have specific
+limits of scale configured. Specify expectations for capabilities and
+dictate which behaviors are acceptable when resource allocation reaches
+limits. Uniformly throttle all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/125.html,
+http://cwe.mitre.org/data/definitions/404.html,
+http://cwe.mitre.org/data/definitions/770.html</p>
+<p><strong>Threat</strong>: 113 - Excessive Allocation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Limit the amount of resources that are
+accessible to unprivileged users. Assume all input is malicious.
+Consider all potentially relevant properties when validating input.
+Consider uniformly throttling all requests in order to make it more
+difficult to consume resources more quickly than they can again be
+freed. Use resource-limiting settings, if possible.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/130.html,
+http://cwe.mitre.org/data/definitions/770.html,
+http://cwe.mitre.org/data/definitions/404.html</p>
+<p><strong>Threat</strong>: 114 - Format String Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Limit the usage of formatting string
+functions. Strong input validation - All user-controllable input must be
+validated and filtered for illegal formatting characters.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/135.html,
+http://cwe.mitre.org/data/definitions/134.html,
+http://cwe.mitre.org/data/definitions/133.html</p>
+<p><strong>Threat</strong>: 115 - Client-side Injection-induced Buffer
+Overflow</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: The client software should not install
+untrusted code from a non-authenticated server. The client software
+should have the latest patches and should be audited for vulnerabilities
+before being used to communicate with potentially hostile servers.
+Perform input validation for length of buffer inputs. Use a language or
+compiler that performs automatic bounds checking. Use an abstraction
+library to abstract away risky APIs. Not a complete solution.
+Compiler-based canary mechanisms such as StackGuard, ProPolice and the
+Microsoft Visual Studio /GS flag. Unless this provides automatic bounds
+checking, it is not a complete solution. Ensure all buffer uses are
+consistently bounds-checked. Use OS-level preventative functionality.
+Not a complete solution.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/14.html,
+http://cwe.mitre.org/data/definitions/74.html,
+http://cwe.mitre.org/data/definitions/353.html</p>
+<p><strong>Threat</strong>: 116 - Command Delimiters</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Perform whitelist validation
+against a positive specification for command length, type, and
+parameters.Design: Limit program privileges, so if commands circumvent
+program input validation or filter routines then commands do not running
+under a privileged accountImplementation: Perform input validation for
+all remote content.Implementation: Use type conversions such as JDBC
+prepared statements.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/15.html,
+http://cwe.mitre.org/data/definitions/146.html,
+http://cwe.mitre.org/data/definitions/77.html,
+http://cwe.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/154.html</p>
+<p><strong>Threat</strong>: 117 - Input Data Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/153.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 118 - Dictionary-based Password Attack</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Create a strong password policy and
+ensure that your system enforces this policy.Implement an intelligent
+password throttling mechanism. Care must be taken to assure that these
+mechanisms do not excessively enable account lockout attacks such as
+CAPEC-02.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/16.html,
+http://cwe.mitre.org/data/definitions/521.html,
+http://cwe.mitre.org/data/definitions/262.html,
+http://cwe.mitre.org/data/definitions/263.html</p>
+<p><strong>Threat</strong>: 119 - Principal Spoof</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Employ robust authentication processes
+(e.g., multi-factor authentication).</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/195.html</p>
+<p><strong>Threat</strong>: 120 - iFrame Overlay</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Configuration: Disable iFrames in the
+Web browser.Operation: When maintaining an authenticated session with a
+privileged target system, do not use the same browser to navigate to
+unfamiliar sites to perform other activities. Finish working with the
+target system and logout first before proceeding to other
+tasks.Operation: If using the Firefox browser, use the NoScript plug-in
+that will help forbid iFrames.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/222.html,
+http://cwe.mitre.org/data/definitions/1021.html</p>
+<p><strong>Threat</strong>: 121 - File Content Injection</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Design: Enforce principle of least
+privilegeDesign: Validate all input for content including files. Ensure
+that if files and remote content must be accepted that once accepted,
+they are placed in a sandbox type location so that lower assurance
+clients cannot write up to higher assurance processes (like Web server
+processes for example)Design: Execute programs with constrained
+privileges, so parent process does not open up further vulnerabilities.
+Ensure that all directories, temporary directories and files, and memory
+are executing with limited privileges to protect against remote
+execution.Design: Proxy communication to host, so that communications
+are terminated at the proxy, sanitizing the requests before forwarding
+to server host.Implementation: Virus scanning on hostImplementation:
+Host integrity monitoring for critical files, directories, and
+processes. The goal of host integrity monitoring is to be aware when a
+security issue has occurred so that incident response and other forensic
+activities can begin.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/23.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 122 - Privilege Escalation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Very carefully manage the setting,
+management, and handling of privileges. Explicitly manage trust zones in
+the software. Follow the principle of least privilege when assigning
+access rights to entities in a software system. Implement separation of
+privilege - Require multiple conditions to be met before permitting
+access to a system resource.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/233.html,
+http://cwe.mitre.org/data/definitions/269.html</p>
+<p><strong>Threat</strong>: 123 - Hijacking a privileged process</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Very carefully manage the setting,
+management, and handling of privileges. Explicitly manage trust zones in
+the software. Follow the principle of least privilege when assigning
+access rights to entities in a software system. Implement separation of
+privilege - Require multiple conditions to be met before permitting
+access to a system resource.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/234.html,
+http://cwe.mitre.org/data/definitions/732.html,
+http://cwe.mitre.org/data/definitions/648.html</p>
+<p><strong>Threat</strong>: 124 - Catching exception throw/signal from
+privileged block</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Application Architects must be careful
+to design callback, signal, and similar asynchronous constructs such
+that they shed excess privilege prior to handing control to user-written
+(thus untrusted) code.Application Architects must be careful to design
+privileged code blocks such that upon return (successful, failed, or
+unpredicted) that privilege is shed prior to leaving the
+block/scope.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/236.html,
+http://cwe.mitre.org/data/definitions/270.html</p>
+<p><strong>Threat</strong>: 125 - Filter Failure through Buffer
+Overflow</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Make sure that ANY failure occurring in
+the filtering or input validation routine is properly handled and that
+offending input is NOT allowed to go through. Basically make sure that
+the vault is closed when failure occurs.Pre-design: Use a language or
+compiler that performs automatic bounds checking.Pre-design through
+Build: Compiler-based canary mechanisms such as StackGuard, ProPolice
+and the Microsoft Visual Studio /GS flag. Unless this provides automatic
+bounds checking, it is not a complete solution.Operational: Use OS-level
+preventative functionality. Not a complete solution.Design: Use an
+abstraction library to abstract away risky APIs. Not a complete
+solution.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/24.html,
+http://cwe.mitre.org/data/definitions/120.html,
+http://cwe.mitre.org/data/definitions/680.html,
+http://cwe.mitre.org/data/definitions/20.html</p>
+<p><strong>Threat</strong>: 126 - Resource Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Ensure all input content that is
+delivered to client is sanitized against an acceptable content
+specification.Perform input validation for all content.Enforce regular
+patching of software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/240.html,
+https://capec.mitre.org/data/definitions/240.html</p>
+<p><strong>Threat</strong>: 127 - Code Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Utilize strict type, character, and
+encoding enforcementEnsure all input content that is delivered to client
+is sanitized against an acceptable content specification.Perform input
+validation for all content.Enforce regular patching of software.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/242.html,
+http://cwe.mitre.org/data/definitions/94.html</p>
+<p><strong>Threat</strong>: 128 - XSS Targeting HTML Attributes</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+white list all input including that which is not expected to have any
+scripting content.Implementation: The victim should configure the
+browser to minimize active content from untrusted sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/243.html</p>
+<p><strong>Threat</strong>: 129 - XSS Targeting URI Placeholders</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Use browser technologies that
+do not allow client side scripting.Design: Utilize strict type,
+character, and encoding enforcement.Implementation: Ensure all content
+that is delivered to client is sanitized against an acceptable content
+specification.Implementation: Ensure all content coming from the client
+is using the same encoding; if not, the server-side application must
+canonicalize the data before applying any filtering.Implementation:
+Perform input validation for all remote content, including remote and
+user-generated contentImplementation: Perform output validation for all
+remote content.Implementation: Disable scripting languages such as
+JavaScript in browserImplementation: Patching software. There are many
+attack vectors for XSS on the client side and the server side. Many
+vulnerabilities are fixed in service packs for browser, web servers, and
+plug in technologies, staying current on patch release that deal with
+XSS countermeasures mitigates this.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/244.html,
+http://cwe.mitre.org/data/definitions/83.html</p>
+<p><strong>Threat</strong>: 130 - XSS Using Doubled Characters</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+sanitize all user supplied fields.Implementation: The victim should
+configure the browser to minimize active content from untrusted
+sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/245.html</p>
+<p><strong>Threat</strong>: 131 - XSS Using Invalid Characters</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Design: Use libraries and templates
+that minimize unfiltered input.Implementation: Normalize, filter and
+white list any input that will be included in any subsequent web pages
+or back end operations.Implementation: The victim should configure the
+browser to minimize active content from untrusted sources.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/247.html,
+https://cwe.mitre.org/data/definitions/86.html</p>
+<p><strong>Threat</strong>: 132 - Command Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All user-controllable input should be
+validated and filtered for potentially unwanted characters. Whitelisting
+input is desired, but if a blacklisting approach is necessary, then
+focusing on command related terms and delimiters is necessary.Input
+should be encoded prior to use in commands to make sure command related
+characters are not treated as part of the command. For example,
+quotation characters may need to be encoded so that the application does
+not treat the quotation as a delimiter.Input should be parameterized, or
+restricted to data sections of a command, thus removing the chance that
+the input will be treated as part of the command itself.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/248.html</p>
+<p><strong>Threat</strong>: 133 - XML Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Strong input validation - All
+user-controllable input must be validated and filtered for illegal
+characters as well as content that can be interpreted in the context of
+an XML data or a query. Use of custom error pages - Attackers can glean
+information about the nature of queries from descriptive error messages.
+Input validation must be coupled with customized error pages that inform
+about an error without disclosing information about the database or
+application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/250.html</p>
+<p><strong>Threat</strong>: 134 - Remote Code Inclusion</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Minimize attacks by input validation
+and sanitization of any user data that will be used by the target
+application to locate a remote file to be included.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/253.html</p>
+<p><strong>Threat</strong>: 135 - Leverage Alternate Encoding</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Assume all input might use an improper
+representation. Use canonicalized data inside the application; all data
+must be converted into the representation used inside the application
+(UTF-8, UTF-16, etc.)Assume all input is malicious. Create a white list
+that defines all valid input to the software system based on the
+requirements specifications. Input that does not match against the white
+list should not be permitted to enter into the system. Test your
+decoding process against malicious input.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/267.html</p>
+<p><strong>Threat</strong>: 136 - Schema Poisoning</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Protect the schema against
+unauthorized modification.Implementation: For applications that use a
+known schema, use a local copy or a known good repository instead of the
+schema reference supplied in the schema document.Implementation: For
+applications that leverage remote schemas, use the HTTPS protocol to
+prevent modification of traffic in transit and to avoid unauthorized
+modification.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/271.html</p>
+<p><strong>Threat</strong>: 137 - Session Hijacking - ClientSide</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Properly encrypt and sign identity
+tokens in transit, and use industry standard session key generation
+mechanisms that utilize high amount of entropy to generate the session
+key. Many standard web and application servers will perform this task on
+your behalf. Utilize a session timeout for all sessions. If the user
+does not explicitly logout, terminate their session after this period of
+inactivity. If the user logs back in then a new session key should be
+generated.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/593.html</p>
+<p><strong>Threat</strong>: 138 - Argument Injection</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Design: Do not program input values
+directly on command shell, instead treat user input as guilty until
+proven innocent. Build a function that takes user input and converts it
+to applications specific types and values, stripping or filtering out
+all unauthorized commands and characters in the process.Design: Limit
+program privileges, so if metacharacters or other methods circumvent
+program input validation routines and shell access is attained then it
+is not running under a privileged account. chroot jails create a sandbox
+for the application to execute in, making it more difficult for an
+attacker to elevate privilege even in the case that a compromise has
+occurred.Implementation: Implement an audit log that is written to a
+separate host, in the event of a compromise the audit log may be able to
+provide evidence and details of the compromise.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/6.html</p>
+<p><strong>Threat</strong>: 139 - Reusing Session IDs (aka Session
+Replay) - ClientSide</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Always invalidate a session ID after
+the user logout.Setup a session time out for the session IDs.Protect the
+communication between the client and server. For instance it is best
+practice to use SSL to mitigate man in the middle attack.Do not code
+send session ID with GET method, otherwise the session ID will be copied
+to the URL. In general avoid writing session IDs in the URLs. URLs can
+get logged in log files, which are vulnerable to an attacker.Encrypt the
+session data associated with the session ID.Use multifactor
+authentication.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/60.html</p>
+<p><strong>Threat</strong>: 140 - Cross Site Request Forgery</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: Use cryptographic tokens to associate a
+request with a specific action. The token can be regenerated at every
+request so that if a request with an invalid token is encountered, it
+can be reliably discarded. The token is considered invalid if it arrived
+with a request other than the action it was supposed to be associated
+with.Although less reliable, the use of the optional HTTP Referrer
+header can also be used to determine whether an incoming request was
+actually one that the user is authorized for, in the current
+context.Additionally, the user can also be prompted to confirm an action
+every time an action concerning potentially sensitive data is invoked.
+This way, even if the attacker manages to get the user to click on a
+malicious link and request the desired action, the user has a chance to
+recover by denying confirmation. This solution is also implicitly tied
+to using a second factor of authentication before performing such
+actions.In general, every request must be checked for the appropriate
+authentication token as well as authorization in the current session
+context.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/62.html</p>
+<h3 id="user-credentials">User credentials</h3>
+<p><strong>Threat</strong>: 141 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 142 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 143 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 144 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 145 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 146 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 147 - Credentials Aging</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All passwords and other credentials
+should have a relatively short expiration date with a possibility to be
+revoked immediately under special circumstances.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/262.html,
+https://cwe.mitre.org/data/definitions/263.html,
+https://cwe.mitre.org/data/definitions/798.html</p>
+<h3 id="auth-response">Auth response</h3>
+<p><strong>Threat</strong>: 148 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 149 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 150 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 151 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 152 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 153 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 154 - Credentials Aging</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All passwords and other credentials
+should have a relatively short expiration date with a possibility to be
+revoked immediately under special circumstances.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/262.html,
+https://cwe.mitre.org/data/definitions/263.html,
+https://cwe.mitre.org/data/definitions/798.html</p>
+<h3 id="user-query">user query</h3>
+<p><strong>Threat</strong>: 155 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 156 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 157 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 158 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 159 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 160 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 161 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 162 - Credentials Aging</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All passwords and other credentials
+should have a relatively short expiration date with a possibility to be
+revoked immediately under special circumstances.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/262.html,
+https://cwe.mitre.org/data/definitions/263.html,
+https://cwe.mitre.org/data/definitions/798.html</p>
+<h3 id="query-result">query result</h3>
+<p><strong>Threat</strong>: 163 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 164 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 165 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 166 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 167 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 168 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 169 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="booking-of-flight">booking of flight</h3>
+<p><strong>Threat</strong>: 170 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 171 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 172 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 173 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 174 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 175 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 176 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="booking-confirmation">booking confirmation</h3>
+<p><strong>Threat</strong>: 177 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 178 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 179 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 180 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 181 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 182 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 183 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-booking-search">flight booking search</h3>
+<p><strong>Threat</strong>: 184 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 185 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 186 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 187 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 188 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 189 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 190 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-booking-search-results">flight booking search
+results</h3>
+<p><strong>Threat</strong>: 191 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 192 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 193 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 194 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 195 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 196 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 197 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="retrieve-webserver-status">retrieve webserver status</h3>
+<p><strong>Threat</strong>: 198 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 199 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 200 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 201 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 202 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 203 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 204 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="retrieve-webserver-status-1">retrieve webserver status</h3>
+<p><strong>Threat</strong>: 205 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 206 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 207 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 208 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 209 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 210 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 211 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="webserver-status-response">webserver status response</h3>
+<p><strong>Threat</strong>: 212 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 213 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 214 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 215 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 216 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 217 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 218 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="webserver-status-response-1">webserver status response</h3>
+<p><strong>Threat</strong>: 219 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 220 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 221 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 222 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 223 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 224 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 225 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-search-database-query">flight search database query</h3>
+<p><strong>Threat</strong>: 226 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 227 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 228 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 229 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 230 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 231 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 232 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-search-database-result">flight search database
+result</h3>
+<p><strong>Threat</strong>: 233 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 234 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 235 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 236 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 237 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 238 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 239 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-booking-database-query">flight booking database
+query</h3>
+<p><strong>Threat</strong>: 240 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 241 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 242 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 243 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 244 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 245 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 246 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-booking-database-result">flight booking database
+result</h3>
+<p><strong>Threat</strong>: 247 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 248 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 249 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 250 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 251 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 252 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 253 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
