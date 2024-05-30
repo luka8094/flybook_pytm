@@ -48,6 +48,22 @@ webapp</figcaption>
 <td>8000</td>
 </tr>
 <tr class="odd">
+<td>user query</td>
+<td>Login</td>
+<td>MySQL Database (*)</td>
+<td>user query (username and password)</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="even">
+<td>query result</td>
+<td>MySQL Database (*)</td>
+<td>Login</td>
+<td>user result (success/failure)</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="odd">
 <td>booking of flight</td>
 <td>Client</td>
 <td>Flight booking</td>
@@ -64,7 +80,7 @@ webapp</figcaption>
 <td>8000</td>
 </tr>
 <tr class="odd">
-<td>flight booking query</td>
+<td>flight booking search</td>
 <td>Client</td>
 <td>Flight search</td>
 <td>flight search query</td>
@@ -72,7 +88,7 @@ webapp</figcaption>
 <td>8000</td>
 </tr>
 <tr class="even">
-<td>flight booking results</td>
+<td>flight booking search results</td>
 <td>Client</td>
 <td>Flight booking</td>
 <td>flight search query</td>
@@ -83,15 +99,63 @@ webapp</figcaption>
 <td>retrieve webserver status</td>
 <td>Flight search</td>
 <td>Service check</td>
-<td>billing logs</td>
-<td>MySQL</td>
+<td>Webserver status</td>
+<td>TCP</td>
 <td>3306</td>
 </tr>
 <tr class="even">
 <td>retrieve webserver status</td>
 <td>Flight booking</td>
 <td>Service check</td>
-<td>billing logs</td>
+<td>Webserver status</td>
+<td>TCP</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td>webserver status response</td>
+<td>Service check</td>
+<td>Flight search</td>
+<td>Webserver status</td>
+<td>TCP</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<td>webserver status response</td>
+<td>Service check</td>
+<td>Flight booking</td>
+<td>Webserver status</td>
+<td>TCP</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<td>flight search database query</td>
+<td>Flight search</td>
+<td>MySQL Database (*)</td>
+<td>SQL query</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="even">
+<td>flight search database result</td>
+<td>MySQL Database (*)</td>
+<td>Flight search</td>
+<td>MySQL query result</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="odd">
+<td>flight booking database query</td>
+<td>Flight booking</td>
+<td>MySQL Database (*)</td>
+<td>SQL query</td>
+<td>MySQL</td>
+<td>3306</td>
+</tr>
+<tr class="even">
+<td>flight booking database result</td>
+<td>MySQL Database (*)</td>
+<td>Flight booking</td>
+<td>MySQL query result</td>
 <td>MySQL</td>
 <td>3306</td>
 </tr>
@@ -2054,7 +2118,7 @@ revoked immediately under special circumstances.</p>
 https://cwe.mitre.org/data/definitions/262.html,
 https://cwe.mitre.org/data/definitions/263.html,
 https://cwe.mitre.org/data/definitions/798.html</p>
-<h3 id="booking-of-flight">booking of flight</h3>
+<h3 id="user-query">user query</h3>
 <p><strong>Threat</strong>: 155 - Interception</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Leverage encryption to encode the
@@ -2128,8 +2192,165 @@ https://cwe.mitre.org/data/definitions/311.html,
 https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 162 - Credentials Aging</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All passwords and other credentials
+should have a relatively short expiration date with a possibility to be
+revoked immediately under special circumstances.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/262.html,
+https://cwe.mitre.org/data/definitions/263.html,
+https://cwe.mitre.org/data/definitions/798.html</p>
+<h3 id="query-result">query result</h3>
+<p><strong>Threat</strong>: 163 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 164 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 165 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 166 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 167 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 168 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 169 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="booking-of-flight">booking of flight</h3>
+<p><strong>Threat</strong>: 170 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 171 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 172 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 173 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 174 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 175 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 176 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
 <h3 id="booking-confirmation">booking confirmation</h3>
-<p><strong>Threat</strong>: 162 - Interception</p>
+<p><strong>Threat</strong>: 177 - Interception</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Leverage encryption to encode the
 transmission of data thus making it accessible only to authorized
@@ -2138,7 +2359,7 @@ parties.</p>
 https://capec.mitre.org/data/definitions/117.html,
 http://cwe.mitre.org/data/definitions/319.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 163 - Content Spoofing</p>
+<p><strong>Threat</strong>: 178 - Content Spoofing</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Validation of user input for type,
 length, data-range, format, etc. Encoding any user input that will be
@@ -2147,14 +2368,14 @@ output by the web application.</p>
 https://capec.mitre.org/data/definitions/148.html,
 http://cwe.mitre.org/data/definitions/345.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 164 - Sniffing Attacks</p>
+<p><strong>Threat</strong>: 179 - Sniffing Attacks</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Encrypt sensitive information when
 transmitted on insecure mediums to prevent interception.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/157.html,
 http://cwe.mitre.org/data/definitions/311.html</p>
-<p><strong>Threat</strong>: 165 - Communication Channel Manipulation</p>
+<p><strong>Threat</strong>: 180 - Communication Channel Manipulation</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: Encrypt all sensitive communications
 using properly-configured cryptography.Design the communication system
@@ -2162,7 +2383,7 @@ such that it associates proper authentication/authorization with each
 channel/message.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/216.html</p>
-<p><strong>Threat</strong>: 166 - Client-Server Protocol
+<p><strong>Threat</strong>: 181 - Client-Server Protocol
 Manipulation</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Use strong authentication
@@ -2170,7 +2391,7 @@ protocols.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/220.html,
 http://cwe.mitre.org/data/definitions/757.html</p>
-<p><strong>Threat</strong>: 167 - Data Leak</p>
+<p><strong>Threat</strong>: 182 - Data Leak</p>
 <p><strong>Severity</strong>: Very High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2186,7 +2407,7 @@ https://cwe.mitre.org/data/definitions/311.html,
 https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
-<p><strong>Threat</strong>: 168 - Unprotected Sensitive Data</p>
+<p><strong>Threat</strong>: 183 - Unprotected Sensitive Data</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2202,8 +2423,8 @@ https://cwe.mitre.org/data/definitions/311.html,
 https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
-<h3 id="flight-booking-query">flight booking query</h3>
-<p><strong>Threat</strong>: 169 - Interception</p>
+<h3 id="flight-booking-search">flight booking search</h3>
+<p><strong>Threat</strong>: 184 - Interception</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Leverage encryption to encode the
 transmission of data thus making it accessible only to authorized
@@ -2212,7 +2433,7 @@ parties.</p>
 https://capec.mitre.org/data/definitions/117.html,
 http://cwe.mitre.org/data/definitions/319.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 170 - Content Spoofing</p>
+<p><strong>Threat</strong>: 185 - Content Spoofing</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Validation of user input for type,
 length, data-range, format, etc. Encoding any user input that will be
@@ -2221,14 +2442,14 @@ output by the web application.</p>
 https://capec.mitre.org/data/definitions/148.html,
 http://cwe.mitre.org/data/definitions/345.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 171 - Sniffing Attacks</p>
+<p><strong>Threat</strong>: 186 - Sniffing Attacks</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Encrypt sensitive information when
 transmitted on insecure mediums to prevent interception.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/157.html,
 http://cwe.mitre.org/data/definitions/311.html</p>
-<p><strong>Threat</strong>: 172 - Communication Channel Manipulation</p>
+<p><strong>Threat</strong>: 187 - Communication Channel Manipulation</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: Encrypt all sensitive communications
 using properly-configured cryptography.Design the communication system
@@ -2236,7 +2457,7 @@ such that it associates proper authentication/authorization with each
 channel/message.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/216.html</p>
-<p><strong>Threat</strong>: 173 - Client-Server Protocol
+<p><strong>Threat</strong>: 188 - Client-Server Protocol
 Manipulation</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Use strong authentication
@@ -2244,7 +2465,7 @@ protocols.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/220.html,
 http://cwe.mitre.org/data/definitions/757.html</p>
-<p><strong>Threat</strong>: 174 - Data Leak</p>
+<p><strong>Threat</strong>: 189 - Data Leak</p>
 <p><strong>Severity</strong>: Very High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2260,7 +2481,7 @@ https://cwe.mitre.org/data/definitions/311.html,
 https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
-<p><strong>Threat</strong>: 175 - Unprotected Sensitive Data</p>
+<p><strong>Threat</strong>: 190 - Unprotected Sensitive Data</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2276,8 +2497,9 @@ https://cwe.mitre.org/data/definitions/311.html,
 https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
-<h3 id="flight-booking-results">flight booking results</h3>
-<p><strong>Threat</strong>: 176 - Interception</p>
+<h3 id="flight-booking-search-results">flight booking search
+results</h3>
+<p><strong>Threat</strong>: 191 - Interception</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Leverage encryption to encode the
 transmission of data thus making it accessible only to authorized
@@ -2286,7 +2508,7 @@ parties.</p>
 https://capec.mitre.org/data/definitions/117.html,
 http://cwe.mitre.org/data/definitions/319.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 177 - Content Spoofing</p>
+<p><strong>Threat</strong>: 192 - Content Spoofing</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Validation of user input for type,
 length, data-range, format, etc. Encoding any user input that will be
@@ -2295,14 +2517,14 @@ output by the web application.</p>
 https://capec.mitre.org/data/definitions/148.html,
 http://cwe.mitre.org/data/definitions/345.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 178 - Sniffing Attacks</p>
+<p><strong>Threat</strong>: 193 - Sniffing Attacks</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Encrypt sensitive information when
 transmitted on insecure mediums to prevent interception.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/157.html,
 http://cwe.mitre.org/data/definitions/311.html</p>
-<p><strong>Threat</strong>: 179 - Communication Channel Manipulation</p>
+<p><strong>Threat</strong>: 194 - Communication Channel Manipulation</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: Encrypt all sensitive communications
 using properly-configured cryptography.Design the communication system
@@ -2310,7 +2532,7 @@ such that it associates proper authentication/authorization with each
 channel/message.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/216.html</p>
-<p><strong>Threat</strong>: 180 - Client-Server Protocol
+<p><strong>Threat</strong>: 195 - Client-Server Protocol
 Manipulation</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Use strong authentication
@@ -2318,7 +2540,7 @@ protocols.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/220.html,
 http://cwe.mitre.org/data/definitions/757.html</p>
-<p><strong>Threat</strong>: 181 - Data Leak</p>
+<p><strong>Threat</strong>: 196 - Data Leak</p>
 <p><strong>Severity</strong>: Very High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2334,7 +2556,7 @@ https://cwe.mitre.org/data/definitions/311.html,
 https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
-<p><strong>Threat</strong>: 182 - Unprotected Sensitive Data</p>
+<p><strong>Threat</strong>: 197 - Unprotected Sensitive Data</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2351,7 +2573,7 @@ https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
 <h3 id="retrieve-webserver-status">retrieve webserver status</h3>
-<p><strong>Threat</strong>: 183 - Interception</p>
+<p><strong>Threat</strong>: 198 - Interception</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Leverage encryption to encode the
 transmission of data thus making it accessible only to authorized
@@ -2360,7 +2582,7 @@ parties.</p>
 https://capec.mitre.org/data/definitions/117.html,
 http://cwe.mitre.org/data/definitions/319.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 184 - Content Spoofing</p>
+<p><strong>Threat</strong>: 199 - Content Spoofing</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Validation of user input for type,
 length, data-range, format, etc. Encoding any user input that will be
@@ -2369,14 +2591,14 @@ output by the web application.</p>
 https://capec.mitre.org/data/definitions/148.html,
 http://cwe.mitre.org/data/definitions/345.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 185 - Sniffing Attacks</p>
+<p><strong>Threat</strong>: 200 - Sniffing Attacks</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Encrypt sensitive information when
 transmitted on insecure mediums to prevent interception.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/157.html,
 http://cwe.mitre.org/data/definitions/311.html</p>
-<p><strong>Threat</strong>: 186 - Communication Channel Manipulation</p>
+<p><strong>Threat</strong>: 201 - Communication Channel Manipulation</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: Encrypt all sensitive communications
 using properly-configured cryptography.Design the communication system
@@ -2384,7 +2606,7 @@ such that it associates proper authentication/authorization with each
 channel/message.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/216.html</p>
-<p><strong>Threat</strong>: 187 - Client-Server Protocol
+<p><strong>Threat</strong>: 202 - Client-Server Protocol
 Manipulation</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Use strong authentication
@@ -2392,7 +2614,7 @@ protocols.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/220.html,
 http://cwe.mitre.org/data/definitions/757.html</p>
-<p><strong>Threat</strong>: 188 - Data Leak</p>
+<p><strong>Threat</strong>: 203 - Data Leak</p>
 <p><strong>Severity</strong>: Very High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2408,7 +2630,7 @@ https://cwe.mitre.org/data/definitions/311.html,
 https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
-<p><strong>Threat</strong>: 189 - Unprotected Sensitive Data</p>
+<p><strong>Threat</strong>: 204 - Unprotected Sensitive Data</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2425,7 +2647,7 @@ https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
 <h3 id="retrieve-webserver-status-1">retrieve webserver status</h3>
-<p><strong>Threat</strong>: 190 - Interception</p>
+<p><strong>Threat</strong>: 205 - Interception</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Leverage encryption to encode the
 transmission of data thus making it accessible only to authorized
@@ -2434,7 +2656,7 @@ parties.</p>
 https://capec.mitre.org/data/definitions/117.html,
 http://cwe.mitre.org/data/definitions/319.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 191 - Content Spoofing</p>
+<p><strong>Threat</strong>: 206 - Content Spoofing</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Validation of user input for type,
 length, data-range, format, etc. Encoding any user input that will be
@@ -2443,14 +2665,14 @@ output by the web application.</p>
 https://capec.mitre.org/data/definitions/148.html,
 http://cwe.mitre.org/data/definitions/345.html,
 https://cwe.mitre.org/data/definitions/299.html</p>
-<p><strong>Threat</strong>: 192 - Sniffing Attacks</p>
+<p><strong>Threat</strong>: 207 - Sniffing Attacks</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Encrypt sensitive information when
 transmitted on insecure mediums to prevent interception.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/157.html,
 http://cwe.mitre.org/data/definitions/311.html</p>
-<p><strong>Threat</strong>: 193 - Communication Channel Manipulation</p>
+<p><strong>Threat</strong>: 208 - Communication Channel Manipulation</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: Encrypt all sensitive communications
 using properly-configured cryptography.Design the communication system
@@ -2458,7 +2680,7 @@ such that it associates proper authentication/authorization with each
 channel/message.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/216.html</p>
-<p><strong>Threat</strong>: 194 - Client-Server Protocol
+<p><strong>Threat</strong>: 209 - Client-Server Protocol
 Manipulation</p>
 <p><strong>Severity</strong>: Medium</p>
 <p><strong>Mitigations</strong>: Use strong authentication
@@ -2466,7 +2688,7 @@ protocols.</p>
 <p><strong>References</strong>:
 https://capec.mitre.org/data/definitions/220.html,
 http://cwe.mitre.org/data/definitions/757.html</p>
-<p><strong>Threat</strong>: 195 - Data Leak</p>
+<p><strong>Threat</strong>: 210 - Data Leak</p>
 <p><strong>Severity</strong>: Very High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
@@ -2482,7 +2704,454 @@ https://cwe.mitre.org/data/definitions/311.html,
 https://cwe.mitre.org/data/definitions/312.html,
 https://cwe.mitre.org/data/definitions/916.html,
 https://cwe.mitre.org/data/definitions/653.html</p>
-<p><strong>Threat</strong>: 196 - Unprotected Sensitive Data</p>
+<p><strong>Threat</strong>: 211 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="webserver-status-response">webserver status response</h3>
+<p><strong>Threat</strong>: 212 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 213 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 214 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 215 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 216 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 217 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 218 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="webserver-status-response-1">webserver status response</h3>
+<p><strong>Threat</strong>: 219 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 220 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 221 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 222 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 223 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 224 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 225 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-search-database-query">flight search database query</h3>
+<p><strong>Threat</strong>: 226 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 227 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 228 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 229 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 230 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 231 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 232 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-search-database-result">flight search database
+result</h3>
+<p><strong>Threat</strong>: 233 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 234 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 235 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 236 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 237 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 238 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 239 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-booking-database-query">flight booking database
+query</h3>
+<p><strong>Threat</strong>: 240 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 241 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 242 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 243 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 244 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 245 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 246 - Unprotected Sensitive Data</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<h3 id="flight-booking-database-result">flight booking database
+result</h3>
+<p><strong>Threat</strong>: 247 - Interception</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Leverage encryption to encode the
+transmission of data thus making it accessible only to authorized
+parties.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/117.html,
+http://cwe.mitre.org/data/definitions/319.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 248 - Content Spoofing</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Validation of user input for type,
+length, data-range, format, etc. Encoding any user input that will be
+output by the web application.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/148.html,
+http://cwe.mitre.org/data/definitions/345.html,
+https://cwe.mitre.org/data/definitions/299.html</p>
+<p><strong>Threat</strong>: 249 - Sniffing Attacks</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Encrypt sensitive information when
+transmitted on insecure mediums to prevent interception.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/157.html,
+http://cwe.mitre.org/data/definitions/311.html</p>
+<p><strong>Threat</strong>: 250 - Communication Channel Manipulation</p>
+<p><strong>Severity</strong>: High</p>
+<p><strong>Mitigations</strong>: Encrypt all sensitive communications
+using properly-configured cryptography.Design the communication system
+such that it associates proper authentication/authorization with each
+channel/message.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/216.html</p>
+<p><strong>Threat</strong>: 251 - Client-Server Protocol
+Manipulation</p>
+<p><strong>Severity</strong>: Medium</p>
+<p><strong>Mitigations</strong>: Use strong authentication
+protocols.</p>
+<p><strong>References</strong>:
+https://capec.mitre.org/data/definitions/220.html,
+http://cwe.mitre.org/data/definitions/757.html</p>
+<p><strong>Threat</strong>: 252 - Data Leak</p>
+<p><strong>Severity</strong>: Very High</p>
+<p><strong>Mitigations</strong>: All data should be encrypted in
+transit. All PII and restricted data must be encrypted at rest. If a
+service is storing credentials used to authenticate users or incoming
+connections, it must only store hashes of them created using
+cryptographic functions, so it is only possible to compare them against
+user input, without fully decoding them. If a client is storing
+credentials in either files or other data store, access to them must be
+as restrictive as possible, including using proper file permissions,
+database users with restricted access or separate storage.</p>
+<p><strong>References</strong>:
+https://cwe.mitre.org/data/definitions/311.html,
+https://cwe.mitre.org/data/definitions/312.html,
+https://cwe.mitre.org/data/definitions/916.html,
+https://cwe.mitre.org/data/definitions/653.html</p>
+<p><strong>Threat</strong>: 253 - Unprotected Sensitive Data</p>
 <p><strong>Severity</strong>: High</p>
 <p><strong>Mitigations</strong>: All data should be encrypted in
 transit. All PII and restricted data must be encrypted at rest. If a
